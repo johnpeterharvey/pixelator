@@ -9,10 +9,10 @@ Needs ImageMagick installed on local system
 
 Run
 
-  bundle install
+    bundle install
 
 
 Place image.jpg into directory, run
 
-  ruby main.rb
+    ruby main.rb
 
