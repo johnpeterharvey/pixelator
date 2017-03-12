@@ -42,5 +42,5 @@ for j in 0..cards_down - 1
   end
 end
 
-test_output.write('output.jpg')
+test_output.write('output.png')
 
