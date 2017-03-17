@@ -7,6 +7,10 @@ Needs ImageMagick installed on local system
 
 ## Usage
 
+Install
+
+    brew install imagemagick
+
 Run
 
     bundle install

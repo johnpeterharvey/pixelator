@@ -33,28 +33,45 @@ p "Input image width #{file.width} height #{file.height}"
 p "Subimage width #{subimage_width} height #{subimage_height}"
 p "Mapped to output width #{output_width} height #{output_height}"
 
-test_output = MiniMagick::Image.new(cards_across * output_width, cards_down * output_height)
-
-# Text writing
-# text = MiniMagick::Draw.new
-# text.font_family = 'menlo'
-# text.pointsize = 54
-# text.fill = '#ffffff'
-# text.gravity = Magick::CenterGravity
+# MiniMagick::Tool::Convert.new do |s|
+#   s.size "#{cards_across * output_width}x#{cards_down * output_height}"
+#   s.xc "white"
+#   s << "output/output.png"
+# end
+# output = MiniMagick::Image.new('output/output.png')
 
 for j in 0..cards_down - 1
   for i in 0..cards_across - 1
-    subimage = MiniMagick::Image.open('image.jpg').crop("#{subimage_width}x#{subimage_height}+#{i * subimage_width}+#{j * subimage_height}")
+    subimage_front = MiniMagick::Image.open('image.jpg').crop("#{subimage_width}x#{subimage_height}+#{i * subimage_width}+#{j * subimage_height}")
     # Get pixel color
-    subimage.scale('1x1')
-    color = subimage.pixel_at(0, 0)
+    subimage_front.scale('1x1')
+    color = subimage_front.pixel_at(0, 0)
     # Scale up to output size
-    subimage.scale("#{output_width}x#{output_height}")
-    # output_image.annotate(text, output_width * 0.2, output_height * 0.2, output_width * 0.7, output_height * 0.7, color)
-    subimage.annotate('')
+    subimage_front.scale("#{[output_width, output_height].max}").crop("#{output_width}x#{output_height}+0+0")
+    
+    p "Writing front #{i} #{j}"
+    subimage_front.write("output/#{i}.#{j}.front.png")
+    
+    # Create the blank image for the background
+    MiniMagick::Tool::Convert.new do |s|
+      s.size "#{output_width}x#{output_height}"
+      s.xc "black"
+      s << "output/#{i}.#{j}.back.png"
+    end
 
-    p "Writing #{i} #{j}"
-    subimage.write("output/#{i}.#{j}.png")
+    # Add text to the back image and write the file out
+    p "Writing back #{i} #{j}"
+    MiniMagick::Image.new("output/#{i}.#{j}.back.png") do |s|
+      s.font 'Helvetica'
+      s.pointsize 40
+      s.gravity 'Center'
+      s.fill '#ffffff'
+      s.draw "text 0,0 #{color}"
+      s.write("output/#{i}.#{j}.back.png")
+    end
+  
+    # Add to the large output image
+    # MiniMagick::Image.new('output/output.png').append("output/#{i}.#{j}.back.png").write('output/output.png')
 
     #test_output = test_output.store_pixels(i * output_width, j * output_height, output_width, output_height, output_image)
   end
