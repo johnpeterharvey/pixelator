@@ -2,12 +2,18 @@ GEM
   remote: https://rubygems.org/
   specs:
     mini_magick (4.6.1)
+    pdf-core (0.7.0)
+    prawn (2.2.2)
+      pdf-core (~> 0.7.0)
+      ttfunk (~> 1.5)
+    ttfunk (1.5.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   mini_magick
+  prawn
 
 BUNDLED WITH
    1.14.6
