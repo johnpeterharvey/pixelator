@@ -1,10 +1,6 @@
 require 'mini_magick'
 require 'prawn'
 
-# MiniMagick.configure do |config|
-#   config.cli = :graphicsmagick
-# end
-
 file = MiniMagick::Image.open('input/image.jpg')
 
 cards_across = 20
@@ -35,24 +31,18 @@ for j in 0..cards_down - 1
     card_front.write(front_path)
     puts "Completed front x#{i} y#{j} "
 
-    # Create the blank image for the background
+    # Create the back image
     back_path = "output/x#{x_coord}y#{y_coord}.back.png"
     MiniMagick::Tool::Convert.new do |s|
       s.size "#{output_width}x#{output_height}"
       s.xc "black"
-      s << back_path
-    end
-
-    # Add text to the back image and write the file out
-    card_back = MiniMagick::Image.new(back_path) do |s|
       s.font 'Helvetica'
       s.pointsize 96
       s.gravity 'Center'
       s.fill '#ffffff'
       s.draw "text 0,0 'x #{x_coord} y #{y_coord}'"
+      s << back_path
     end
-    card_back.write(back_path)
-
     puts "Completed back #{i} #{j}"
 
     Prawn::Document.generate("output/x#{x_coord}y#{y_coord}.pdf", :margin => 0, :page_size => [output_width, output_height]) do 
