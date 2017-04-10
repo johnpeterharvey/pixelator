@@ -5,7 +5,17 @@ Cut an image into single colour mini card size images
 
 Needs ImageMagick installed on local system
 
-## Usage
+## Docker
+
+Build
+
+    docker build -t pixelator .
+
+Run
+
+    docker run -it -v $INPUT_DIR:/input -v $OUTPUT_DIR:/output pixelator
+
+## Or
 
 Install
 
