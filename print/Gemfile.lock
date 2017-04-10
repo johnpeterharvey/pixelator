@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    attr_extras (5.2.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  attr_extras
+
+BUNDLED WITH
+   1.14.6

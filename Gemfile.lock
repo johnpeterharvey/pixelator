@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    mini_magick (4.6.1)
+    mini_magick (4.7.0)
     pdf-core (0.7.0)
     prawn (2.2.2)
       pdf-core (~> 0.7.0)

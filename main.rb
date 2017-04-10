@@ -8,7 +8,7 @@ cards_down   = 20
 card_width   = 70
 card_height  = 28
 
-output_mult   = 20 # Output image will be this * card_width wide, this * card_height tall
+output_mult   = 10 # Output image will be this * card_width wide, this * card_height tall
 output_width  = card_width * output_mult
 output_height = card_height * output_mult
 

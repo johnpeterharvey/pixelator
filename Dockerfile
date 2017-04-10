@@ -6,7 +6,7 @@ VOLUME /output
 # Build tools and ruby
 RUN apt-get update \
  && apt-get dist-upgrade -y \
- && apt-get install -y curl build-essential pkg-config ruby-dev libpng-dev libjpeg-dev
+ && apt-get install -y curl build-essential pkg-config ruby-dev libpng-dev libjpeg-dev fontconfig
 
 # Install ImageMagick 7 - not available from repository yet
 RUN curl http://www.imagemagick.org/download/ImageMagick.tar.gz | tar xvz \
