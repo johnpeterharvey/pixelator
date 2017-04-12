@@ -5,7 +5,21 @@ Cut an image into single colour mini card size images
 
 Needs ImageMagick installed on local system
 
-## Usage
+## Docker
+
+Build
+
+    docker build -t pixelator .
+
+Run
+
+    docker run -it -v $INPUT_DIR:/input -v $OUTPUT_DIR:/output pixelator
+
+## Or
+
+Install
+
+    brew install imagemagick
 
 Run
 
@@ -35,5 +49,5 @@ Place image.jpg into directory, run
 ### Individual Output Tile
 
 <p align="center">
-  <img width="200" alt="Input image" src="examples/1.1.png">
+  <img width="200" alt="Input image" src="examples/x00y00.front.png">
 </p>

@@ -1,46 +1,57 @@
-require 'RMagick'
-include Magick
+require 'mini_magick'
+require 'prawn'
 
-file = ImageList.new('image.jpg')
-width = file.columns - 1
-height =  file.rows - 1
+file = MiniMagick::Image.open('input/image.jpg')
 
 cards_across = 20
 cards_down   = 20
 card_width   = 70
 card_height  = 28
 
-output_mult   = 5 # Output image will be this * card_width wide, this * card_height tall
+output_mult   = 10 # Output image will be this * card_width wide, this * card_height tall
 output_width  = card_width * output_mult
 output_height = card_height * output_mult
 
-subimage_width = width / cards_across
-subimage_height = height / cards_down
+puts "Input image width #{file.width} height #{file.height}"
+puts "Mapped to output width #{output_width} height #{output_height}"
 
-test_output = Image.new(cards_across * output_width, cards_down * output_height)
-
-# Text writing
-text = Draw.new
-text.font_family = 'menlo'
-text.pointsize = 16
-text.fill = '#ffffff'
-text.gravity = Magick::CenterGravity
+print 'Writing large combined output...'
+file.resize("#{cards_across}x#{cards_down}!")
+    .sample("#{cards_across * output_width}x#{cards_down * output_height}!")
+    .write('output/output.png')
+puts 'done'
 
 for j in 0..cards_down - 1
   for i in 0..cards_across - 1
-    subimage = file.excerpt(i * subimage_width, j * subimage_height, subimage_width, subimage_height)
-    # Get pixel color
-    single_pixel_subimage = subimage.scale(1, 1)
-    
-    color = single_pixel_subimage.get_pixels(0, 0, 1, 1).first.to_color(ComplianceType::AllCompliance, false, 8, true)
+    x_coord = i.to_s.rjust(2, "0")
+    y_coord = j.to_s.rjust(2, "0")
 
-    output_image = single_pixel_subimage.scale(output_width, output_height)
-    output_image.annotate(text, output_width * 0.2, output_height * 0.20, output_width * 0.7, output_height * 0.7, color)
-    output_image.write("#{i}.#{j}.png")
+    front_path = "output/x#{x_coord}y#{y_coord}.front.png"
+    card_front = MiniMagick::Image.open('output/output.png').crop("#{output_width}x#{output_height}+#{i * output_width}+#{j * output_height}")
+    card_front.write(front_path)
+    puts "Completed front x#{i} y#{j} "
 
-    test_output = test_output.store_pixels(i * output_width, j * output_height, output_width, output_height, output_image.get_pixels(0, 0, output_width, output_height))
+    # Create the back image
+    back_path = "output/x#{x_coord}y#{y_coord}.back.png"
+    MiniMagick::Tool::Convert.new do |s|
+      s.size "#{output_width}x#{output_height}"
+      s.xc "black"
+      s.font 'SourceCodePro'
+      s.pointsize 96
+      s.gravity 'Center'
+      s.fill '#ffffff'
+      s.draw "text 0,0 \"x #{x_coord} y #{y_coord}\""
+      s << back_path
+    end
+    puts "Completed back #{i} #{j}"
+
+    Prawn::Document.generate("output/x#{x_coord}y#{y_coord}.pdf", :margin => 0, :page_size => [output_width, output_height]) do 
+      image front_path
+      start_new_page
+      image back_path
+    end
+    puts "Completed PDF #{i} #{j}"
   end
 end
 
-test_output.write('output.png')
-
+puts 'Complete'
