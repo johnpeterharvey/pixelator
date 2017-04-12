@@ -49,5 +49,5 @@ Place image.jpg into directory, run
 ### Individual Output Tile
 
 <p align="center">
-  <img width="200" alt="Input image" src="examples/1.1.png">
+  <img width="200" alt="Input image" src="examples/x00y00.front.png">
 </p>

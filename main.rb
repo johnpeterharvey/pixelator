@@ -36,11 +36,11 @@ for j in 0..cards_down - 1
     MiniMagick::Tool::Convert.new do |s|
       s.size "#{output_width}x#{output_height}"
       s.xc "black"
-      s.font 'Helvetica'
+      s.font 'SourceCodePro'
       s.pointsize 96
       s.gravity 'Center'
       s.fill '#ffffff'
-      s.draw "text 0,0 'x #{x_coord} y #{y_coord}'"
+      s.draw "text 0,0 \"x #{x_coord} y #{y_coord}\""
       s << back_path
     end
     puts "Completed back #{i} #{j}"
