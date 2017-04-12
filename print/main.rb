@@ -43,23 +43,33 @@ class Pack
     end
 end
 
-cardSides = [CardSide.new(1, 'image'), CardSide.new(2, 'details')]
-
-cards = Array.new(2)
-(0..99).each do |c|
-    cards[c] = Card.new(c, cardSides)
+side_data = Array.new
+(1..10).each do |s|
+    (1..10).each do |t|
+        side_data << SideData.new('fixedImageData', 'background_template', "http:///x#{s}y#{t}.front.png")
+    end
+end
+(1..10).each do |s|
+    (1..10).each do |t|
+        side_data << SideData.new('fixedImageData', 'background_template', "http:///x#{s}y#{t}.back.png")
+    end
 end
 
-side_data = SideData.new('fixedImageData', 'background_template', 'https://upload.wikimedia.org/wikipedia/commons/a/ae/AfricanWildCat.jpg')
+cards = Array.new(100)
+(1..100).each do |c|
+    cards[c] = Card.new(c, [CardSide.new(c, 'image'), CardSide.new(100 + c, 'details')])
+end
 
-sides = Array.new(2)
-sides[0] = Side.new('image', 1, 'minicard_full_image_landscape', side_data)
-sides[1] = Side.new('details', 2, 'minicard_full_details_image_landscape', side_data)
+sides = Array.new(200)
+(1..100).each do |s|
+    sides[s] = Side.new('image', s, 'minicard_full_image_landscape', side_data[s - 1])
+    sides[100 + s] = Side.new('details', 100 + s, 'minicard_full_details_image_landscape', side_data[100 + s - 1])
+end
 
-pack = Pack.new(1, 100, 'minicard', sides, cards)
+pack = Pack.new(1, 100, 'minicard', sides[1..200], cards[1..100])
 
 pack_json = pack.to_json
-# puts pack_json
+#puts pack_json
 
 client = OAuth2::Client.new(ENV['CLIENT_ID'], ENV['CLIENT_SECRET'], :site => 'http://www.moo.com/api/service/')
 response = client.request(:post, '/api/service/?method=moo.pack.createPack&product=minicard', {:body => {'pack' => pack_json}})
