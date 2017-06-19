@@ -35,38 +35,78 @@ class Side
     end
 end
 
+class ImageBasketItem
+    pattr_initialize :type, :resourceUri
+
+    def to_json(_)
+        {'type' => type, 'resourceUri' => resourceUri}.to_json
+    end
+end
+
+class ImageBasket
+    pattr_initialize :type, :name, :immutable, :items
+
+    def to_json(_)
+        {'type' => type, 'name' => name, 'immutable' => immutable, 'items' => items}.to_json
+    end
+end
+
 class Pack
-    pattr_initialize :version, :count, :product, :sides, :cards
+    pattr_initialize :version, :count, :product, :sides, :cards, :images
 
     def to_json
         {'productVersion' => version, 'numCards' => count, 'productCode' => product, 'sides' => sides, 'cards' => cards}.to_json
     end
 end
 
+if !ENV['CLIENT_ID'] || !ENV['CLIENT_SECRET'] || !ENV['IMAGE_HOST']
+    puts 'Set CLIENT_ID and CLIENT_SECRET env vars with MOO API values, and IMAGE_HOST with host that has images'
+    exit 1
+end
+
+x_count = 10
+y_count = 10
+card_count = x_count * y_count
+side_count = card_count * 2
+
+images = Array.new
+(1..x_count).each do |s|
+    (1..y_count).each do |t|
+        x_coord = s.to_s.rjust(2, "0")
+        y_coord = t.to_s.rjust(2, "0")
+        images << ImageBasketItem.new('print', "http://#{ENV['IMAGE_HOST']}/x#{x_coord}y#{y_coord}.front.png")
+    end
+end
+image_basket = ImageBasket.new(nil, nil, false, images)
+
 side_data = Array.new
-(1..10).each do |s|
-    (1..10).each do |t|
-        side_data << SideData.new('fixedImageData', 'background_template', "http:///x#{s}y#{t}.front.png")
+(1..x_count).each do |s|
+    (1..y_count).each do |t|
+        x_coord = s.to_s.rjust(2, "0")
+        y_coord = t.to_s.rjust(2, "0")
+        side_data << SideData.new('fixedImageData', 'background_template', "http://#{ENV['IMAGE_HOST']}/x#{x_coord}y#{y_coord}.front.png")
     end
 end
-(1..10).each do |s|
-    (1..10).each do |t|
-        side_data << SideData.new('fixedImageData', 'background_template', "http:///x#{s}y#{t}.back.png")
+(1..x_count).each do |s|
+    (1..y_count).each do |t|
+        x_coord = s.to_s.rjust(2, "0")
+        y_coord = t.to_s.rjust(2, "0")
+        side_data << SideData.new('fixedImageData', 'background_template', "http://#{ENV['IMAGE_HOST']}/x#{x_coord}y#{y_coord}.back.png")
     end
 end
 
-cards = Array.new(100)
-(1..100).each do |c|
-    cards[c] = Card.new(c, [CardSide.new(c, 'image'), CardSide.new(100 + c, 'details')])
+cards = Array.new(card_count)
+(1..card_count).each do |c|
+    cards[c] = Card.new(c, [CardSide.new(c, 'image'), CardSide.new(card_count + c, 'details')])
 end
 
-sides = Array.new(200)
-(1..100).each do |s|
+sides = Array.new(side_count)
+(1..card_count).each do |s|
     sides[s] = Side.new('image', s, 'minicard_full_image_landscape', side_data[s - 1])
-    sides[100 + s] = Side.new('details', 100 + s, 'minicard_full_details_image_landscape', side_data[100 + s - 1])
+    sides[card_count + s] = Side.new('details', card_count + s, 'minicard_full_details_image_landscape', side_data[card_count + s - 1])
 end
 
-pack = Pack.new(1, 100, 'minicard', sides[1..200], cards[1..100])
+pack = Pack.new(1, card_count, 'minicard', sides[1..side_count], cards[1..card_count], image_basket)
 
 pack_json = pack.to_json
 #puts pack_json
